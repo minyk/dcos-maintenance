@@ -1,0 +1,7 @@
+schema_version = 1
+name = "maintenance"
+
+[[commands]]
+name = "maintenance"
+path = "bin/dcos-maintenance"
+description = "Mesos Maintenance Subcommand"

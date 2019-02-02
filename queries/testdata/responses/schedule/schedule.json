@@ -1,0 +1,24 @@
+{
+  "type": "GET_MAINTENANCE_SCHEDULE",
+  "get_maintenance_schedule": {
+    "schedule": {
+      "windows": [
+        {
+          "machine_ids": [
+            {
+              "hostname": "myhost"
+            },
+            {
+              "ip": "0.0.0.2"
+            }
+          ],
+          "unavailability": {
+            "start": {
+              "nanoseconds": 1470849373150643200
+            }
+          }
+        }
+      ]
+    }
+  }
+}

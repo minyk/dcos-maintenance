@@ -1,0 +1,19 @@
+{
+  "type": "GET_MAINTENANCE_STATUS",
+  "get_maintenance_status": {
+    "status": {
+      "draining_machines": [
+        {
+          "id": {
+            "ip": "0.0.0.2"
+          }
+        },
+        {
+          "id": {
+            "hostname": "myhost"
+          }
+        }
+      ]
+    }
+  }
+}
