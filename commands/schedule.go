@@ -24,10 +24,6 @@ func (cmd *scheduleHandler) handleUpdate(a *kingpin.Application, e *kingpin.Pars
 	return cmd.q.GetSchedule(cmd.rawJSON)
 }
 
-func (cmd *scheduleHandler) handleStatus(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
-	return cmd.q.GetStatus(cmd.rawJSON)
-}
-
 // HandleScheduleSection
 func HandleScheduleSection(app *kingpin.Application, q *queries.Schedule) {
 	HandleScheduleCommands(app.Command("schedule", "View current maintenance schedule").Alias("schedules"), q)
@@ -44,7 +40,4 @@ func HandleScheduleCommands(schedule *kingpin.CmdClause, q *queries.Schedule) {
 	update.Arg("duration", "Duration of maintenance schedule").Required().DurationVar(&cmd.duration)
 	update.Arg("file", "Name of a specific file to update").Required().StringVar(&cmd.filename)
 	update.Flag("json", "Show raw JSON response instead of user-friendly tree").BoolVar(&cmd.rawJSON)
-
-	status := schedule.Command("status", "Display status of maintenance schedule").Action(cmd.handleStatus)
-	status.Flag("json", "Show raw JSON response instead of user-friendly tree").BoolVar(&cmd.rawJSON)
 }

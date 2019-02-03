@@ -37,8 +37,10 @@ func GetArguments() []string {
 // all of the standard subcommands of the CLI.
 func HandleDefaultSections(app *kingpin.Application) {
 	scheduleQueries := queries.NewSchedule()
+	statusQueries := queries.NewStatus()
 
 	commands.HandleScheduleSection(app, scheduleQueries)
+	commands.HandleStatusSection(app, statusQueries)
 }
 
 // New instantiates a new kingpin.Application and returns a reference to it.
