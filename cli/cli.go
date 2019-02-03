@@ -36,9 +36,11 @@ func GetArguments() []string {
 // HandleDefaultSections is a utility method to allow applications built around this library to provide
 // all of the standard subcommands of the CLI.
 func HandleDefaultSections(app *kingpin.Application) {
+	machineQueries := queries.NewMachine()
 	scheduleQueries := queries.NewSchedule()
 	statusQueries := queries.NewStatus()
 
+	commands.HandleMachineSection(app, machineQueries)
 	commands.HandleScheduleSection(app, scheduleQueries)
 	commands.HandleStatusSection(app, statusQueries)
 }

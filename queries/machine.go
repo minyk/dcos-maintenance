@@ -18,6 +18,26 @@ func NewMachine() *Machine {
 func (q *Machine) MachineDown(mids []mesos.MachineID) error {
 	body := master.Call{
 		Type: master.Call_START_MAINTENANCE,
+		// TODO add machines
+	}
+
+	requestContent, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	responseBytes, err := client.HTTPServicePostData("", requestContent, "application/json")
+	if err != nil {
+		return err
+	}
+	client.PrintJSONBytes(responseBytes)
+	return nil
+}
+
+func (q *Machine) MachineUp(mids []mesos.MachineID) error {
+	body := master.Call{
+		Type: master.Call_STOP_MAINTENANCE,
+		// TODO add machines
 	}
 
 	requestContent, err := json.Marshal(body)
