@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/mesos/mesos-go/api/v1/lib"
+	"github.com/mesos/mesos-go/api/v1/lib/maintenance"
 	"github.com/mesos/mesos-go/api/v1/lib/master"
 	"github.com/minyk/dcos-maintenance/client"
 	"strings"
@@ -44,9 +46,29 @@ func (q *Schedule) GetSchedule(rawJSON bool) error {
 	return nil
 }
 
-func (q *Schedule) UpdateSchedule(start time.Time, duration time.Duration, file string) error {
+func (q *Schedule) AddSchedule(start time.Time, duration time.Duration, file string) error {
+	unav := mesos.Unavailability{
+		Start: mesos.TimeInfo{
+			Nanoseconds: start.UnixNano(),
+		},
+		Duration: &mesos.DurationInfo{
+			Nanoseconds: duration.Nanoseconds(),
+		},
+	}
+
+	schedule := maintenance.Schedule{
+		Windows: []maintenance.Window{
+			{
+				Unavailability: unav,
+			},
+		},
+	}
+
 	body := master.Call{
 		Type: master.Call_UPDATE_MAINTENANCE_SCHEDULE,
+		UpdateMaintenanceSchedule: &master.Call_UpdateMaintenanceSchedule{
+			Schedule: schedule,
+		},
 	}
 
 	requestContent, err := json.Marshal(body)
@@ -54,12 +76,56 @@ func (q *Schedule) UpdateSchedule(start time.Time, duration time.Duration, file 
 		return err
 	}
 
-	_, err = client.HTTPServicePostJSON("", requestContent)
+	client.PrintJSONBytes(requestContent)
+	//_, err = client.HTTPServicePostJSON("", requestContent)
+	//if err != nil {
+	//	return err
+	//} else {
+	//	client.PrintMessage("Schedules updated")
+	//}
+
+	return nil
+}
+
+func (q *Schedule) RemoveSchedule(file string) error {
+	// TODO get and update ?
+
+	unav := mesos.Unavailability{
+		Start: mesos.TimeInfo{
+			Nanoseconds: 0,
+		},
+		Duration: &mesos.DurationInfo{
+			Nanoseconds: 0,
+		},
+	}
+
+	schedule := maintenance.Schedule{
+		Windows: []maintenance.Window{
+			{
+				Unavailability: unav,
+			},
+		},
+	}
+
+	body := master.Call{
+		Type: master.Call_UPDATE_MAINTENANCE_SCHEDULE,
+		UpdateMaintenanceSchedule: &master.Call_UpdateMaintenanceSchedule{
+			Schedule: schedule,
+		},
+	}
+
+	requestContent, err := json.Marshal(body)
 	if err != nil {
 		return err
-	} else {
-		client.PrintMessage("Schedules updated")
 	}
+
+	client.PrintJSONBytes(requestContent)
+	//_, err = client.HTTPServicePostJSON("", requestContent)
+	//if err != nil {
+	//	return err
+	//} else {
+	//	client.PrintMessage("Schedules updated")
+	//}
 
 	return nil
 }

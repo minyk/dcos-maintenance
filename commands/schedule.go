@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/araddon/dateparse"
 	"github.com/minyk/dcos-maintenance/queries"
 	"gopkg.in/alecthomas/kingpin.v3-unstable"
 	"time"
@@ -9,8 +10,7 @@ import (
 type scheduleHandler struct {
 	q        *queries.Schedule
 	name     string
-	startt   string
-	start    time.Time
+	start    string
 	duration time.Duration
 	filename string
 	rawJSON  bool
@@ -21,7 +21,15 @@ func (cmd *scheduleHandler) handleList(a *kingpin.Application, e *kingpin.ParseE
 }
 
 func (cmd *scheduleHandler) handleUpdate(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
-	return cmd.q.GetSchedule(cmd.rawJSON)
+	t, err := dateparse.ParseAny(cmd.start)
+	if err != nil {
+		panic(err)
+	}
+	return cmd.q.AddSchedule(t, cmd.duration, "")
+}
+
+func (cmd *scheduleHandler) handleRemove(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
+	return cmd.q.RemoveSchedule("")
 }
 
 // HandleScheduleSection
@@ -35,9 +43,11 @@ func HandleScheduleCommands(schedule *kingpin.CmdClause, q *queries.Schedule) {
 	view := schedule.Command("view", "Display current maintenance schedule").Action(cmd.handleList)
 	view.Flag("json", "Show raw JSON response instead of user-friendly tree").BoolVar(&cmd.rawJSON)
 
-	update := schedule.Command("update", "Update maintenance schedule").Action(cmd.handleUpdate)
-	update.Arg("start", "Start time of this maintenance schedule").Required().StringVar(&cmd.startt)
-	update.Arg("duration", "Duration of maintenance schedule").Required().DurationVar(&cmd.duration)
-	update.Arg("file", "Name of a specific file to update").Required().StringVar(&cmd.filename)
-	update.Flag("json", "Show raw JSON response instead of user-friendly tree").BoolVar(&cmd.rawJSON)
+	add := schedule.Command("add", "Add maintenance schedule").Action(cmd.handleUpdate)
+	add.Flag("start-at", "Start time of this maintenance schedule.").Required().StringVar(&cmd.start)
+	add.Flag("duration", "Duration of maintenance schedule. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.").Required().DurationVar(&cmd.duration)
+	add.Flag("file", "Name of a specific file to update").Required().StringVar(&cmd.filename)
+
+	remove := schedule.Command("remove", "Remove maintenance schedule").Action(cmd.handleRemove)
+	remove.Flag("file", "Name of a specific file to update").Required().StringVar(&cmd.filename)
 }
