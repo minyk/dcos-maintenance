@@ -3,3 +3,7 @@
 
 # binary
 dcos-maintenance
+
+# govendor
+vendor/
+!vendor/vendor.json
