@@ -25,11 +25,11 @@ func (cmd *scheduleHandler) handleUpdate(a *kingpin.Application, e *kingpin.Pars
 	if err != nil {
 		panic(err)
 	}
-	return cmd.q.AddSchedule(t, cmd.duration, "")
+	return cmd.q.AddSchedule(t, cmd.duration, cmd.filename)
 }
 
 func (cmd *scheduleHandler) handleRemove(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
-	return cmd.q.RemoveSchedule("")
+	return cmd.q.RemoveSchedule(cmd.filename)
 }
 
 // HandleScheduleSection

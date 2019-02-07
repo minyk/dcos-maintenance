@@ -1,13 +1,16 @@
 package queries
 
 import (
+	"bufio"
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/mesos/mesos-go/api/v1/lib"
 	"github.com/mesos/mesos-go/api/v1/lib/maintenance"
 	"github.com/mesos/mesos-go/api/v1/lib/master"
 	"github.com/minyk/dcos-maintenance/client"
+	"os"
 	"strings"
 	"time"
 )
@@ -21,121 +24,119 @@ func NewSchedule() *Schedule {
 }
 
 func (q *Schedule) GetSchedule(rawJSON bool) error {
-	body := master.Call{
-		Type: master.Call_GET_MAINTENANCE_SCHEDULE,
-	}
 
-	requestContent, err := json.Marshal(body)
-	if err != nil {
-		return err
-	}
+	responseBytes := getSchedule()
 
-	responseBytes, err := client.HTTPServicePostData("", requestContent, "application/json")
-	if err != nil {
-		return err
-	}
 	if rawJSON {
 		client.PrintJSONBytes(responseBytes)
 	} else {
-		tree, err := toScheduleTable(responseBytes)
+		table, err := toScheduleTable(responseBytes)
 		if err != nil {
 			return err
 		}
-		client.PrintMessage(tree)
+		client.PrintMessage(table)
 	}
 	return nil
 }
 
 func (q *Schedule) AddSchedule(start time.Time, duration time.Duration, file string) error {
-	unav := mesos.Unavailability{
-		Start: mesos.TimeInfo{
-			Nanoseconds: start.UnixNano(),
-		},
-		Duration: &mesos.DurationInfo{
-			Nanoseconds: duration.Nanoseconds(),
-		},
-	}
+	// TODO get and add ?
 
-	schedule := maintenance.Schedule{
-		Windows: []maintenance.Window{
-			{
-				Unavailability: unav,
+	ret := getSchedule()
+	resp := master.Response{}
+	err := json.Unmarshal(ret, &resp)
+
+	currentSchedule := resp.GetMaintenanceSchedule.Schedule
+
+	mIDs := toMachineIDs(file)
+
+	newWindow := maintenance.Window{
+		MachineIDs: mIDs,
+		Unavailability: mesos.Unavailability{
+			Start: mesos.TimeInfo{
+				Nanoseconds: start.UnixNano(),
+			},
+			Duration: &mesos.DurationInfo{
+				Nanoseconds: duration.Nanoseconds(),
 			},
 		},
 	}
 
+	currentSchedule.Windows = append(currentSchedule.Windows, newWindow)
+
 	body := master.Call{
 		Type: master.Call_UPDATE_MAINTENANCE_SCHEDULE,
 		UpdateMaintenanceSchedule: &master.Call_UpdateMaintenanceSchedule{
-			Schedule: schedule,
+			Schedule: currentSchedule,
 		},
 	}
 
-	requestContent, err := json.Marshal(body)
+	err = updateSchedule(body)
 	if err != nil {
 		return err
 	}
-
-	client.PrintJSONBytes(requestContent)
-	//_, err = client.HTTPServicePostJSON("", requestContent)
-	//if err != nil {
-	//	return err
-	//} else {
-	//	client.PrintMessage("Schedules updated")
-	//}
+	client.PrintMessage("Maintenance schedule updated successfully.")
 
 	return nil
 }
 
 func (q *Schedule) RemoveSchedule(file string) error {
-	// TODO get and update ?
 
-	unav := mesos.Unavailability{
-		Start: mesos.TimeInfo{
-			Nanoseconds: 0,
-		},
-		Duration: &mesos.DurationInfo{
-			Nanoseconds: 0,
-		},
+	// Get current schedule
+	ret := getSchedule()
+	resp := master.Response{}
+	err := json.Unmarshal(ret, &resp)
+	currentSchedule := resp.GetMaintenanceSchedule.Schedule
+
+	// IDs to remove
+	mIDs := toMachineIDs(file)
+	client.PrintVerbose("Get MachinID list from %s: %d", file, len(mIDs))
+
+	newIDs := []mesos.MachineID{}
+	newWindows := []maintenance.Window{}
+
+	// remove ID and set the left IDs back
+	for _, window := range currentSchedule.Windows {
+		for _, currentID := range window.MachineIDs {
+			client.PrintVerbose("Contains %s: %s", currentID.GetIP(), containMID(mIDs, currentID))
+			if !containMID(mIDs, currentID) {
+				newIDs = append(newIDs, currentID)
+			}
+		}
+
+		if len(newIDs) != 0 {
+			window.MachineIDs = newIDs
+			newIDs = nil
+			newWindows = append(newWindows, window)
+		}
 	}
 
-	schedule := maintenance.Schedule{
-		Windows: []maintenance.Window{
-			{
-				Unavailability: unav,
-			},
-		},
+	if len(newWindows) != 0 {
+		currentSchedule.Windows = newWindows
+	} else {
+		currentSchedule.Windows = nil
 	}
 
 	body := master.Call{
 		Type: master.Call_UPDATE_MAINTENANCE_SCHEDULE,
 		UpdateMaintenanceSchedule: &master.Call_UpdateMaintenanceSchedule{
-			Schedule: schedule,
+			Schedule: currentSchedule,
 		},
 	}
 
-	requestContent, err := json.Marshal(body)
+	err = updateSchedule(body)
 	if err != nil {
 		return err
 	}
 
-	client.PrintJSONBytes(requestContent)
-	//_, err = client.HTTPServicePostJSON("", requestContent)
-	//if err != nil {
-	//	return err
-	//} else {
-	//	client.PrintMessage("Schedules updated")
-	//}
-
+	client.PrintMessage("Maintenance schedule updated successfully.")
 	return nil
 }
 
 func toScheduleTable(planJSONBytes []byte) (string, error) {
 	schedule := master.Response{}
 	err := json.Unmarshal(planJSONBytes, &schedule)
-	if err != nil {
-		return "", err
-	}
+	check(err)
 
 	var buf bytes.Buffer
 	buf.WriteString(fmt.Sprintln("Window\tHostname\t\tIP\t\tStart\t\t\t\tDuration"))
@@ -154,4 +155,74 @@ func toScheduleTable(planJSONBytes []byte) (string, error) {
 	}
 
 	return strings.TrimRight(buf.String(), "\n"), nil
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func toMachineIDs(filename string) []mesos.MachineID {
+	f, err := os.Open(filename)
+	check(err)
+
+	rdr := csv.NewReader(bufio.NewReader(f))
+	rdr.Comment = '#'
+	lists, err := rdr.ReadAll()
+	check(err)
+
+	var mids []mesos.MachineID
+
+	for _, line := range lists {
+		mid := mesos.MachineID{
+			IP:       &line[1],
+			Hostname: &line[0],
+		}
+		mids = append(mids, mid)
+	}
+
+	return mids
+}
+
+func getSchedule() []byte {
+	body := master.Call{
+		Type: master.Call_GET_MAINTENANCE_SCHEDULE,
+	}
+
+	requestContent, err := json.Marshal(body)
+	check(err)
+
+	responseBytes, err := client.HTTPServicePostJSON("", requestContent)
+	check(err)
+
+	return responseBytes
+}
+
+func updateSchedule(body master.Call) error {
+
+	requestContent, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	client.PrintJSONBytes(requestContent)
+	//_, err = client.HTTPServicePostJSON("", requestContent)
+	//if err != nil {
+	//	return err
+	//} else {
+	//	client.PrintMessage("Schedules updated")
+	//}
+
+	return nil
+}
+
+func containMID(s []mesos.MachineID, e mesos.MachineID) bool {
+
+	for _, a := range s {
+		if a.Equal(e) {
+			return true
+		}
+	}
+	return false
 }
