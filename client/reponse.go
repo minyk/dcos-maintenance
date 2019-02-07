@@ -91,7 +91,7 @@ Could not reach the service scheduler with name '%s':
 - Was the service recently installed or updated? It may still be initializing, wait a bit and try again.
 - Did you provide the correct service name? Specify a service name with '--name=<name>', or with 'dcos config set %s.service_name <name>'. For more syntax information`,
 			config.ServiceName, config.ModuleName)
-	case response.StatusCode < 200 || response.StatusCode >= 300:
+	case response.StatusCode < 202 || response.StatusCode >= 300:
 		return createResponseError(response, body)
 	}
 	return nil
