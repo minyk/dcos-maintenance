@@ -1,16 +1,13 @@
 package queries
 
 import (
-	"bufio"
 	"bytes"
-	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/mesos/mesos-go/api/v1/lib"
 	"github.com/mesos/mesos-go/api/v1/lib/maintenance"
 	"github.com/mesos/mesos-go/api/v1/lib/master"
 	"github.com/minyk/dcos-maintenance/client"
-	"os"
 	"strings"
 	"time"
 )
@@ -157,34 +154,6 @@ func toScheduleTable(planJSONBytes []byte) (string, error) {
 	return strings.TrimRight(buf.String(), "\n"), nil
 }
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func toMachineIDs(filename string) []mesos.MachineID {
-	f, err := os.Open(filename)
-	check(err)
-
-	rdr := csv.NewReader(bufio.NewReader(f))
-	rdr.Comment = '#'
-	lists, err := rdr.ReadAll()
-	check(err)
-
-	var mids []mesos.MachineID
-
-	for _, line := range lists {
-		mid := mesos.MachineID{
-			IP:       &line[1],
-			Hostname: &line[0],
-		}
-		mids = append(mids, mid)
-	}
-
-	return mids
-}
-
 func getSchedule() []byte {
 	body := master.Call{
 		Type: master.Call_GET_MAINTENANCE_SCHEDULE,
@@ -215,14 +184,4 @@ func updateSchedule(body master.Call) error {
 	//}
 
 	return nil
-}
-
-func containMID(s []mesos.MachineID, e mesos.MachineID) bool {
-
-	for _, a := range s {
-		if a.Equal(e) {
-			return true
-		}
-	}
-	return false
 }

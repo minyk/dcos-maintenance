@@ -8,10 +8,15 @@ import (
 type machineHandler struct {
 	q    *queries.Machine
 	name string
+	file string
 }
 
 func (cmd *machineHandler) handleMachineUp(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
-	return cmd.q.MachineUp(nil)
+	return cmd.q.MachineUp(cmd.file)
+}
+
+func (cmd *machineHandler) handleMachineDown(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
+	return cmd.q.MachineUp(cmd.file)
 }
 
 // HandleScheduleSection
@@ -23,8 +28,8 @@ func HandleMachineSection(app *kingpin.Application, q *queries.Machine) {
 func HandleMachineCommands(machine *kingpin.CmdClause, q *queries.Machine) {
 	cmd := &machineHandler{q: q}
 	up := machine.Command("up", "Stop maintenance for machines").Action(cmd.handleMachineUp)
-	up.Flag("machines", "IP or Hostname for machine. Comma separated value can be used.").StringVar(&cmd.name)
+	up.Flag("list", "Name of a specific file which contains hostname, ip lists for machine up.").StringVar(&cmd.file)
 
-	down := machine.Command("down", "Start maintenance for machines").Action(cmd.handleMachineUp)
-	down.Flag("machines", "IP or Hostname for machine. Comma separated value can be used.").StringVar(&cmd.name)
+	down := machine.Command("down", "Start maintenance for machines").Action(cmd.handleMachineDown)
+	down.Flag("list", "Name of a specific file which contains hostname, ip lists for machine down.").StringVar(&cmd.file)
 }
