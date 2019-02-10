@@ -7,3 +7,6 @@ dcos-maintenance
 # govendor
 vendor/
 !vendor/vendor.json
+
+# build
+build/
