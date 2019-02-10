@@ -78,7 +78,7 @@ func New() *kingpin.Application {
 	// --info and --config-schema are required by the main DC/OS CLI:
 	// Prints a description of the module.
 	app.Flag("info", "Show short description.").Hidden().PreAction(func(*kingpin.Application, *kingpin.ParseElement, *kingpin.ParseContext) error {
-		fmt.Fprintf(os.Stdout, "%s DC/OS CLI Module\n", strings.Title(config.ModuleName))
+		fmt.Fprintf(os.Stdout, "Maintenance Mesos cluster\n")
 		os.Exit(0)
 		return nil
 	}).Bool()
