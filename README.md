@@ -16,19 +16,11 @@ DC/OS CLI Subcommand for mesos maintenance
 * down
 
 ```sh
-$ dcos maintenance machine down --hostname="ap1" --ip="10.10.10.1"
-```
-
-```sh
 $ dcos maintenance machine down --list="list.csv"
 ```
 
 
 * up
-
-```sh
-$ dcos maintenance machine up --hostname="ap1" --ip="10.10.10.1"
-```
 
 ```sh
 $ dcos maintenance machine up --list="list.csv"
