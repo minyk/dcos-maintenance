@@ -5,6 +5,61 @@ DC/OS CLI Subcommand for mesos maintenance
 
 # Subcommands
 
+```sh
+$ dcos maintenance
+
+usage: dcos maintenance [<flags>] <command>
+
+
+Flags:
+  -h, --help                Show context-sensitive help.
+  -v, --verbose             Enable extra logging of requests/responses
+      --name="maintenance"  Name of the service instance to query
+
+Commands:
+  help [<command> ...]
+    Show help.
+
+
+  machine up [<flags>]
+    Stop maintenance for machines
+
+    --list=LIST  Name of a specific file which contains hostname, ip lists for machine up.
+
+
+  machine down [<flags>]
+    Start maintenance for machines
+
+    --list=LIST  Name of a specific file which contains hostname, ip lists for machine down.
+
+
+  schedule view [<flags>]
+    Display current maintenance schedule
+
+    --json  Show raw JSON response instead of user-friendly tree
+
+
+  schedule add --start-at=START-AT --duration=DURATION --file=FILE
+    Add maintenance schedule
+
+    --start-at=START-AT  Start time of this maintenance schedule.
+    --duration=DURATION  Duration of maintenance schedule. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.
+    --file=FILE          Name of a specific file to update
+
+
+  schedule remove --file=FILE
+    Remove maintenance schedule
+
+    --file=FILE  Name of a specific file to update
+
+
+  status [<flags>]
+    Display current maintenance status
+
+    --json  Show raw JSON response instead of user-friendly tree
+
+```
+
 ## maintenance machine
 
 ### down
