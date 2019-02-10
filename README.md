@@ -1,6 +1,8 @@
 DC/OS CLI Subcommand for mesos maintenance
 ==========================================
 
+**CAUTION: This is not battle-hardened yet. USE AT YOUR OWN RISK.** 
+
 # Subcommands
 
 ## maintenance machine
