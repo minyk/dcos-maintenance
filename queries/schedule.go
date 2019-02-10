@@ -175,13 +175,13 @@ func updateSchedule(body master.Call) error {
 		return err
 	}
 
-	client.PrintJSONBytes(requestContent)
-	//_, err = client.HTTPServicePostJSON("", requestContent)
-	//if err != nil {
-	//	return err
-	//} else {
-	//	client.PrintMessage("Schedules updated")
-	//}
+	client.PrintVerbose("Request JSON: %s", requestContent)
+	_, err = client.HTTPServicePostJSON("", requestContent)
+	if err != nil {
+		return err
+	} else {
+		client.PrintMessage("Schedules updated")
+	}
 
 	return nil
 }
