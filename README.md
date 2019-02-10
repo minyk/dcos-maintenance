@@ -104,6 +104,68 @@ Status		Hostname		IP		Offer
 Draining	ap13.dcos.ajway.kr	172.22.30.51	none
 ```
 
+# How to
+
+## Build
+
+* Install docker >= 1.13
+* Run `make build`(or manually run command in `Makefile`).
+
+## Install
+
+* First of all, see this document for dc/os cli subcommand plugin: https://github.com/dcos/dcos-cli/blob/master/design/plugin.md
+
+* Make direcdories like:
+```
+$ mkdir -p ~/.dcos/clusters/<cluster-hash>/subcommands/maintenance
+$ mkdir -p ~/.dcos/clusters/<cluster-hash>/subcommands/maintenance/env/bin
+```
+
+* Copy binary into `env/bin`
+
+```
+$ cp build/dcos-maintenance-<OS> ~/.dcos/clusters/<cluster-hash>/subcommands/maintenance/env/bin/dcos-maintenance
+```
+
+* Copy `plugin.toml`
+
+```
+$ cp plugin.toml ~/.dcos/clusters/<cluster-hash>/subcommands/maintenance/env/
+```
+
+* Touch `package.json`
+
+```
+$ touch ~/.dcos/clusters/<cluster-hash>/subcommands/maintenance/package.json
+```
+
+From this moment, your dcos-cli should recognize maintenance subcommand plugin.
+
+```
+$ dcos
+Command line utility for the Mesosphere Datacenter Operating
+System (DC/OS). The Mesosphere DC/OS is a distributed operating
+system built around Apache Mesos. This utility provides tools
+for easy management of a DC/OS installation.
+
+Available DC/OS commands:
+
+	auth           	Authenticate to DC/OS cluster
+	cluster        	Manage your DC/OS clusters
+	config         	Manage the DC/OS configuration file
+	experimental   	Manage commands that are under development
+	help           	Display help information about DC/OS
+	job            	Deploy and manage jobs in DC/OS
+	maintenance    	Maintenance DC/OS CLI Module
+	marathon       	Deploy and manage applications to DC/OS
+	node           	View DC/OS node information
+	package        	Install and manage DC/OS software packages
+	service        	Manage DC/OS services
+	task           	Manage DC/OS tasks
+
+Get detailed command description with 'dcos <command> --help'.
+```
+
 # Acknowledgement
 
 * Main idea is inspired by https://github.com/dcos-labs/dcos-management
