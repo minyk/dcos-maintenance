@@ -18,7 +18,7 @@ func (q *Machine) MachineDown(file string) error {
 
 	// IDs to down
 	mIDs := toMachineIDs(file)
-	_, err := client.PrintVerbose("Get MachinID list from %s: %d", file, len(mIDs))
+	_, err := client.PrintVerbose("Get MachinIDs list from %s: %d", file, len(mIDs))
 	check(err)
 
 	body := master.Call{
@@ -38,14 +38,16 @@ func (q *Machine) MachineDown(file string) error {
 		return err
 	}
 
-	_, err = client.PrintMessage("Maintenance started for:")
-	check(err)
+	for _, mId := range mIDs {
+		client.PrintMessage("Maintenance started for: %s", mId.GetHostname())
+	}
+
 	return nil
 }
 
 func (q *Machine) MachineUp(file string) error {
 	mIDs := toMachineIDs(file)
-	_, err := client.PrintVerbose("Get MachinID list from %s: %d", file, len(mIDs))
+	_, err := client.PrintVerbose("Get MachinIDs list from %s: %d", file, len(mIDs))
 	check(err)
 
 	body := master.Call{
@@ -65,7 +67,9 @@ func (q *Machine) MachineUp(file string) error {
 		return err
 	}
 
-	_, err = client.PrintMessage("Maintenance stopped for:")
-	check(err)
+	for _, mId := range mIDs {
+		client.PrintMessage("Maintenance stopped for: %s", mId.GetHostname())
+	}
+
 	return nil
 }
