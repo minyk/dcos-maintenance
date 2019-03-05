@@ -16,7 +16,7 @@ func (cmd *machineHandler) handleMachineUp(a *kingpin.Application, e *kingpin.Pa
 }
 
 func (cmd *machineHandler) handleMachineDown(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
-	return cmd.q.MachineUp(cmd.file)
+	return cmd.q.MachineDown(cmd.file)
 }
 
 // HandleScheduleSection
