@@ -39,18 +39,18 @@ Commands:
     --json  Show raw JSON response instead of user-friendly tree
 
 
-  schedule add --start-at=START-AT --duration=DURATION --file=FILE
+  schedule add --start-at=START-AT --duration=DURATION --list=LIST
     Add maintenance schedule
 
     --start-at=START-AT  Start time of this maintenance schedule.
     --duration=DURATION  Duration of maintenance schedule. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.
-    --file=FILE          Name of a specific file to update
+    --list=LIST          Name of a specific file to update
 
 
-  schedule remove --file=FILE
+  schedule remove --list=LIST
     Remove maintenance schedule
 
-    --file=FILE  Name of a specific file to update
+    --list=LIST  Name of a specific file to update
 
 
   status [<flags>]
@@ -85,7 +85,7 @@ $ dcos maintenance machine up --list="list.csv"
 
 ### add
 
-Add machines to schedule with `--start-at` and `--duration` flag. Target machines are supplied with `--file` flag, `CSV` file format. This command does not add machines to current schedules. It creates new `Window` with start time and duration, and add it to schedule. 
+Add machines to schedule with `--start-at` and `--duration` flag. Target machines are supplied with `--list` flag, `CSV` file format. This command does not add machines to current schedules. It creates new `Window` with start time and duration, and add it to schedule. 
 
  * Thanks to [araddon/dateparse](https://github.com/araddon/dateparse) library, start time can handle very wide range of format. See more on their [examples](https://github.com/araddon/dateparse#extended-example).
  * Duration uses golang `time.Duration` which can handle a unit suffix, such as "300ms", "-1.5h" or "2h45m". Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`.
@@ -98,7 +98,7 @@ Add machines to schedule with `--start-at` and `--duration` flag. Target machine
 
 ### remove
   
-Remove machines from all current schedule windows.  Target machines are supplied with `--file` flag, `CSV` file format.
+Remove machines from all current schedule windows.  Target machines are supplied with `--list` flag, `CSV` file format.
 
 ### view 
 
@@ -118,14 +118,14 @@ Window	Hostname		IP		Start				Duration
 * add 
 
 ```sh
-$ dcos maintenance schedule add --start-at="2019-01-01" --duration="200s" --file="list.csv"
+$ dcos maintenance schedule add --start-at="2019-01-01" --duration="200s" --list="list.csv"
 Maintenance schedule updated successfully.
 ```
 
 * remove
 
 ```sh
-$ dcos maintenance schedule remove --file="list.csv"
+$ dcos maintenance schedule remove --list="list.csv"
 Maintenance schedule updated successfully.
 ```
 

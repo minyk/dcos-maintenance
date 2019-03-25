@@ -23,7 +23,7 @@ func (cmd *scheduleHandler) handleList(a *kingpin.Application, e *kingpin.ParseE
 func (cmd *scheduleHandler) handleUpdate(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
 	t, err := dateparse.ParseAny(cmd.start)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return cmd.q.AddSchedule(t, cmd.duration, cmd.filename)
 }
@@ -46,8 +46,8 @@ func HandleScheduleCommands(schedule *kingpin.CmdClause, q *queries.Schedule) {
 	add := schedule.Command("add", "Add maintenance schedule").Action(cmd.handleUpdate)
 	add.Flag("start-at", "Start time of this maintenance schedule.").Required().StringVar(&cmd.start)
 	add.Flag("duration", "Duration of maintenance schedule. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.").Required().DurationVar(&cmd.duration)
-	add.Flag("file", "Name of a specific file to update").Required().StringVar(&cmd.filename)
+	add.Flag("list", "Name of the list file to update").Required().StringVar(&cmd.filename)
 
 	remove := schedule.Command("remove", "Remove maintenance schedule").Action(cmd.handleRemove)
-	remove.Flag("file", "Name of a specific file to update").Required().StringVar(&cmd.filename)
+	remove.Flag("list", "Name of the list file to update").Required().StringVar(&cmd.filename)
 }
