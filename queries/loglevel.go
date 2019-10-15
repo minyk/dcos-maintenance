@@ -38,12 +38,12 @@ func (q *Loglevel) SetLoglevel(agentid string, level int, duration time.Duration
 		return err
 	}
 
-	responseBytes, err := client.HTTPServicePostJSON(q.PrefixAgent(agentid), requestContent)
+	_, err = client.HTTPServicePostJSON(q.PrefixAgent(agentid), requestContent)
 	if err != nil {
 		return err
 	}
 
-	client.PrintJSONBytes(responseBytes)
+	client.PrintMessage("Request Accepted: %s", agentid)
 
 	return nil
 }

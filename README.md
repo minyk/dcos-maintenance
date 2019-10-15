@@ -58,6 +58,14 @@ Commands:
 
     --json  Show raw JSON response instead of user-friendly tree
 
+
+  loglevel set --agent-id=AGENT-ID --duration=DURATION --level=LEVEL
+    set log level of agent.
+
+    --agent-id=AGENT-ID  Agent id of mesos-slave.
+    --duration=DURATION  Duration of modified log level. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.
+    --level=LEVEL        Level of log. 0, 1, 2 or 3
+
 ```
 
 ## maintenance machine
@@ -149,6 +157,16 @@ Display status of current schedule.
 $ dcos maintenance status
 Status		Hostname		IP		Offer
 Draining	ap13.dcos.ajway.kr	172.22.30.51	none
+```
+
+## maintenance loglevel
+
+### Examples
+
+* Set log level of agent ef71ac72-3f3e-4bd8-9i4a-4db098706e06-S10 to 6 during 10 seconds: 
+```sh
+$ dcos maintenance loglevel set --agent-id=ef71ac72-3f3e-4bd8-9i4a-4db098706e06-S10 --level=6 --duration=10s
+
 ```
 
 # How to
