@@ -17,12 +17,14 @@ type Schedule struct {
 }
 
 func NewSchedule() *Schedule {
-	return &Schedule{}
+	return &Schedule{
+		PrefixCb: func() string { return "/mesos/api/v1/" },
+	}
 }
 
 func (q *Schedule) GetSchedule(rawJSON bool) error {
 
-	responseBytes := getSchedule()
+	responseBytes := getSchedule(q.PrefixCb())
 
 	if rawJSON {
 		client.PrintJSONBytes(responseBytes)
@@ -39,7 +41,7 @@ func (q *Schedule) GetSchedule(rawJSON bool) error {
 func (q *Schedule) AddSchedule(start time.Time, duration time.Duration, file string) error {
 	// TODO get and add ?
 
-	ret := getSchedule()
+	ret := getSchedule(q.PrefixCb())
 	resp := master.Response{}
 	err := json.Unmarshal(ret, &resp)
 
@@ -68,7 +70,7 @@ func (q *Schedule) AddSchedule(start time.Time, duration time.Duration, file str
 		},
 	}
 
-	err = updateSchedule(body)
+	err = updateSchedule(body, q.PrefixCb())
 	if err != nil {
 		return err
 	}
@@ -80,7 +82,7 @@ func (q *Schedule) AddSchedule(start time.Time, duration time.Duration, file str
 func (q *Schedule) RemoveSchedule(file string) error {
 
 	// Get current schedule
-	ret := getSchedule()
+	ret := getSchedule(q.PrefixCb())
 	resp := master.Response{}
 	err := json.Unmarshal(ret, &resp)
 	currentSchedule := resp.GetMaintenanceSchedule.Schedule
@@ -121,7 +123,7 @@ func (q *Schedule) RemoveSchedule(file string) error {
 		},
 	}
 
-	err = updateSchedule(body)
+	err = updateSchedule(body, q.PrefixCb())
 	if err != nil {
 		return err
 	}
@@ -154,7 +156,7 @@ func toScheduleTable(planJSONBytes []byte) (string, error) {
 	return strings.TrimRight(buf.String(), "\n"), nil
 }
 
-func getSchedule() []byte {
+func getSchedule(urlPath string) []byte {
 	body := master.Call{
 		Type: master.Call_GET_MAINTENANCE_SCHEDULE,
 	}
@@ -162,13 +164,13 @@ func getSchedule() []byte {
 	requestContent, err := json.Marshal(body)
 	check(err)
 
-	responseBytes, err := client.HTTPServicePostJSON("", requestContent)
+	responseBytes, err := client.HTTPServicePostJSON(urlPath, requestContent)
 	check(err)
 
 	return responseBytes
 }
 
-func updateSchedule(body master.Call) error {
+func updateSchedule(body master.Call, urlPath string) error {
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {
@@ -176,7 +178,7 @@ func updateSchedule(body master.Call) error {
 	}
 
 	client.PrintVerbose("Request JSON: %s", requestContent)
-	_, err = client.HTTPServicePostJSON("", requestContent)
+	_, err = client.HTTPServicePostJSON(urlPath, requestContent)
 	if err != nil {
 		return err
 	} else {

@@ -14,7 +14,9 @@ type Status struct {
 }
 
 func NewStatus() *Status {
-	return &Status{}
+	return &Status{
+		PrefixCb: func() string { return "/mesos/api/v1/" },
+	}
 }
 
 func (q *Status) GetStatus(rawJSON bool) error {
@@ -27,7 +29,7 @@ func (q *Status) GetStatus(rawJSON bool) error {
 		return err
 	}
 
-	responseBytes, err := client.HTTPServicePostJSON("", requestContent)
+	responseBytes, err := client.HTTPServicePostJSON(q.PrefixCb(), requestContent)
 	if err != nil {
 		return err
 	}

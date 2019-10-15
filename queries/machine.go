@@ -11,7 +11,9 @@ type Machine struct {
 }
 
 func NewMachine() *Machine {
-	return &Machine{}
+	return &Machine{
+		PrefixCb: func() string { return "/mesos/api/v1/" },
+	}
 }
 
 func (q *Machine) MachineDown(file string) error {
@@ -33,7 +35,7 @@ func (q *Machine) MachineDown(file string) error {
 		return err
 	}
 
-	_, err = client.HTTPServicePostJSON("", requestContent)
+	_, err = client.HTTPServicePostJSON(q.PrefixCb(), requestContent)
 	if err != nil {
 		return err
 	}
@@ -62,7 +64,7 @@ func (q *Machine) MachineUp(file string) error {
 		return err
 	}
 
-	_, err = client.HTTPServicePostJSON("", requestContent)
+	_, err = client.HTTPServicePostJSON(q.PrefixCb(), requestContent)
 	if err != nil {
 		return err
 	}
