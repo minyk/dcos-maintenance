@@ -40,11 +40,13 @@ func HandleDefaultSections(app *kingpin.Application) {
 	scheduleQueries := queries.NewSchedule()
 	statusQueries := queries.NewStatus()
 	loglevelQueries := queries.NewLoglevel()
+	exhibitorQueries := queries.NewExhibitor()
 
 	commands.HandleMachineSection(app, machineQueries)
 	commands.HandleScheduleSection(app, scheduleQueries)
 	commands.HandleStatusSection(app, statusQueries)
 	commands.HandleLogLevelSection(app, loglevelQueries)
+	commands.HandleExhibitorSection(app, exhibitorQueries)
 }
 
 // New instantiates a new kingpin.Application and returns a reference to it.
