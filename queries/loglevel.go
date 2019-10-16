@@ -49,6 +49,21 @@ func (q *Loglevel) SetLoglevel(agentid string, level int, duration time.Duration
 	return nil
 }
 
+func (q *Loglevel) SetLoglevelAll(level int, duration time.Duration) error {
+	list, err := q.getAgentList()
+	if err != nil {
+		return err
+	}
+
+	for _, id := range list {
+		err = q.SetLoglevel(id, level, duration)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (q *Loglevel) GetLoglevelAll() error {
 	list, err := q.getAgentList()
 	if err != nil {
