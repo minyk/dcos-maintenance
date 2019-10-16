@@ -44,13 +44,13 @@ Commands:
 
     --start-at=START-AT  Start time of this maintenance schedule.
     --duration=DURATION  Duration of maintenance schedule. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.
-    --list=LIST          Name of a specific file to update
+    --list=LIST          Name of the list file to update
 
 
   schedule remove --list=LIST
     Remove maintenance schedule
 
-    --list=LIST  Name of a specific file to update
+    --list=LIST  Name of the list file to update
 
 
   status [<flags>]
@@ -59,12 +59,25 @@ Commands:
     --json  Show raw JSON response instead of user-friendly tree
 
 
-  loglevel set --agent-id=AGENT-ID --duration=DURATION --level=LEVEL
+  loglevel set --duration=DURATION --level=LEVEL [<flags>]
     set log level of agent.
 
-    --agent-id=AGENT-ID  Agent id of mesos-slave.
+    --agent-id=AGENT-ID  Agent id of the target mesos slave node. If missing, all slave nodes are targeted.
     --duration=DURATION  Duration of modified log level. Can use unit h for hours, m for minutes, s for seconds. e.g: 1h.
-    --level=LEVEL        Level of log. 0, 1, 2 or 3
+    --level=LEVEL        Level of log. 0 to 6.
+
+
+  loglevel get [<flags>]
+    Get logging level of an agent.
+
+    --agent-id=AGENT-ID  Agent ID of the target mesos slave node. If missing, all slave nodes are targeted.
+
+
+  exhibitor delete --[no-]confirm [<flags>]
+    Delete znode on DC/OS Master Exhibitor
+
+    --znode=ZNODE  ZNode path for deletion.
+    --confirm      Confirm this deletion.
 
 ```
 
