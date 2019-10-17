@@ -2,7 +2,9 @@ package queries
 
 import (
 	"encoding/json"
-	"github.com/mesos/mesos-go/api/v1/lib/master"
+	//mesos "github.com/mesos/mesos-go/api/v1/lib"
+	//"github.com/mesos/mesos-go/api/v1/lib/master"
+	"github.com/mesos/mesos-go/api/v1/lib/master/calls"
 	"github.com/minyk/dcos-maintenance/client"
 )
 
@@ -23,12 +25,7 @@ func (q *Machine) MachineDown(file string) error {
 	_, err := client.PrintVerbose("Get MachinIDs list from %s: %d", file, len(mIDs))
 	check(err)
 
-	body := master.Call{
-		Type: master.Call_START_MAINTENANCE,
-		StartMaintenance: &master.Call_StartMaintenance{
-			Machines: mIDs,
-		},
-	}
+	body := calls.StartMaintenance(mIDs...)
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {
@@ -52,12 +49,7 @@ func (q *Machine) MachineUp(file string) error {
 	_, err := client.PrintVerbose("Get MachinIDs list from %s: %d", file, len(mIDs))
 	check(err)
 
-	body := master.Call{
-		Type: master.Call_STOP_MAINTENANCE,
-		StopMaintenance: &master.Call_StopMaintenance{
-			Machines: mIDs,
-		},
-	}
+	body := calls.StopMaintenance(mIDs...)
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {

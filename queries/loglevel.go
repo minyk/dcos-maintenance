@@ -3,9 +3,10 @@ package queries
 import (
 	"encoding/json"
 	"fmt"
-	mesos "github.com/mesos/mesos-go/api/v1/lib"
 	"github.com/mesos/mesos-go/api/v1/lib/agent"
+	agentcalls "github.com/mesos/mesos-go/api/v1/lib/agent/calls"
 	"github.com/mesos/mesos-go/api/v1/lib/master"
+	mastercalls "github.com/mesos/mesos-go/api/v1/lib/master/calls"
 	"github.com/minyk/dcos-maintenance/client"
 	"time"
 )
@@ -24,15 +25,7 @@ func NewLoglevel() *Loglevel {
 
 func (q *Loglevel) SetLoglevel(agentid string, level int, duration time.Duration) error {
 
-	body := agent.Call{
-		Type: agent.Call_SET_LOGGING_LEVEL,
-		SetLoggingLevel: &agent.Call_SetLoggingLevel{
-			Level: uint32(level),
-			Duration: mesos.DurationInfo{
-				Nanoseconds: duration.Nanoseconds(),
-			},
-		},
-	}
+	body := agentcalls.SetLoggingLevel(uint32(level), duration)
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {
@@ -80,9 +73,7 @@ func (q *Loglevel) GetLoglevelAll() error {
 }
 
 func (q *Loglevel) GetLoglevel(agentid string) error {
-	body := agent.Call{
-		Type: agent.Call_GET_LOGGING_LEVEL,
-	}
+	body := agentcalls.GetLoggingLevel()
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {
@@ -105,9 +96,7 @@ func (q *Loglevel) GetLoglevel(agentid string) error {
 }
 
 func (q *Loglevel) getAgentList() ([]string, error) {
-	body := master.Call{
-		Type: master.Call_GET_AGENTS,
-	}
+	body := mastercalls.GetAgents()
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/mesos/mesos-go/api/v1/lib"
 	"github.com/mesos/mesos-go/api/v1/lib/maintenance"
 	"github.com/mesos/mesos-go/api/v1/lib/master"
+	"github.com/mesos/mesos-go/api/v1/lib/master/calls"
 	"github.com/minyk/dcos-maintenance/client"
 	"strings"
 	"time"
@@ -62,13 +63,7 @@ func (q *Schedule) AddSchedule(start time.Time, duration time.Duration, file str
 	}
 
 	currentSchedule.Windows = append(currentSchedule.Windows, newWindow)
-
-	body := master.Call{
-		Type: master.Call_UPDATE_MAINTENANCE_SCHEDULE,
-		UpdateMaintenanceSchedule: &master.Call_UpdateMaintenanceSchedule{
-			Schedule: currentSchedule,
-		},
-	}
+	body := calls.UpdateMaintenanceSchedule(currentSchedule)
 
 	err = updateSchedule(body, q.PrefixCb())
 	if err != nil {
@@ -116,12 +111,7 @@ func (q *Schedule) RemoveSchedule(file string) error {
 		currentSchedule.Windows = nil
 	}
 
-	body := master.Call{
-		Type: master.Call_UPDATE_MAINTENANCE_SCHEDULE,
-		UpdateMaintenanceSchedule: &master.Call_UpdateMaintenanceSchedule{
-			Schedule: currentSchedule,
-		},
-	}
+	body := calls.UpdateMaintenanceSchedule(currentSchedule)
 
 	err = updateSchedule(body, q.PrefixCb())
 	if err != nil {
@@ -157,9 +147,8 @@ func toScheduleTable(planJSONBytes []byte) (string, error) {
 }
 
 func getSchedule(urlPath string) []byte {
-	body := master.Call{
-		Type: master.Call_GET_MAINTENANCE_SCHEDULE,
-	}
+
+	body := calls.GetMaintenanceSchedule()
 
 	requestContent, err := json.Marshal(body)
 	check(err)
@@ -170,7 +159,7 @@ func getSchedule(urlPath string) []byte {
 	return responseBytes
 }
 
-func updateSchedule(body master.Call, urlPath string) error {
+func updateSchedule(body *master.Call, urlPath string) error {
 
 	requestContent, err := json.Marshal(body)
 	if err != nil {

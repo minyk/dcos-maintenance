@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/mesos/mesos-go/api/v1/lib/master"
+	"github.com/mesos/mesos-go/api/v1/lib/master/calls"
 	"github.com/minyk/dcos-maintenance/client"
 	"strings"
 )
@@ -20,10 +21,8 @@ func NewStatus() *Status {
 }
 
 func (q *Status) GetStatus(rawJSON bool) error {
-	body := master.Call{
-		Type: master.Call_GET_MAINTENANCE_STATUS,
-	}
 
+	body := calls.GetMaintenanceStatus()
 	requestContent, err := json.Marshal(body)
 	if err != nil {
 		return err
