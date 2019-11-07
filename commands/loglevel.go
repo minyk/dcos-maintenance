@@ -32,16 +32,13 @@ func HandleLogLevelCommands(loglevel *kingpin.CmdClause, q *queries.Loglevel) {
 func (cmd *loglevelHandler) handleSetLogLevel(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
 	if cmd.agentid != "" {
 		return cmd.q.SetLoglevel(cmd.agentid, cmd.level, cmd.duration)
-	} else {
-		return cmd.q.SetLoglevelAll(cmd.level, cmd.duration)
 	}
-
+	return cmd.q.SetLoglevelAll(cmd.level, cmd.duration)
 }
 
 func (cmd *loglevelHandler) handleGetLogLevel(a *kingpin.Application, e *kingpin.ParseElement, c *kingpin.ParseContext) error {
 	if cmd.agentid != "" {
 		return cmd.q.GetLoglevel(cmd.agentid)
-	} else {
-		return cmd.q.GetLoglevelAll()
 	}
+	return cmd.q.GetLoglevelAll()
 }

@@ -11,7 +11,7 @@ type statusHandler struct {
 	rawJSON bool
 }
 
-// HandleScheduleSection
+// HandleStatusSection blah blah
 func HandleStatusSection(app *kingpin.Application, q *queries.Status) {
 	HandleStatusCommands(app.Command("status", "Display current maintenance status").Alias("statuses"), q)
 }
@@ -20,7 +20,7 @@ func (cmd *statusHandler) handleStatus(a *kingpin.Application, e *kingpin.ParseE
 	return cmd.q.GetStatus(cmd.rawJSON)
 }
 
-// HandleScheduleCommand
+// HandleStatusCommands blah blah
 func HandleStatusCommands(status *kingpin.CmdClause, q *queries.Status) {
 	cmd := &statusHandler{q: q}
 

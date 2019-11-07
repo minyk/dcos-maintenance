@@ -19,12 +19,12 @@ func (cmd *machineHandler) handleMachineDown(a *kingpin.Application, e *kingpin.
 	return cmd.q.MachineDown(cmd.file)
 }
 
-// HandleScheduleSection
+// HandleMachineSection blah blah
 func HandleMachineSection(app *kingpin.Application, q *queries.Machine) {
 	HandleMachineCommands(app.Command("machine", "Modify machine status.").Alias("machines"), q)
 }
 
-// HandleScheduleCommand
+// HandleMachineCommands blah blah
 func HandleMachineCommands(machine *kingpin.CmdClause, q *queries.Machine) {
 	cmd := &machineHandler{q: q}
 	up := machine.Command("up", "Stop maintenance for machines").Action(cmd.handleMachineUp)

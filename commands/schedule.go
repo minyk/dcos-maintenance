@@ -32,12 +32,12 @@ func (cmd *scheduleHandler) handleRemove(a *kingpin.Application, e *kingpin.Pars
 	return cmd.q.RemoveSchedule(cmd.filename)
 }
 
-// HandleScheduleSection
+// HandleScheduleSection blah blah
 func HandleScheduleSection(app *kingpin.Application, q *queries.Schedule) {
 	HandleScheduleCommands(app.Command("schedule", "View current maintenance schedule").Alias("schedules"), q)
 }
 
-// HandleScheduleCommand
+// HandleScheduleCommands blah blah
 func HandleScheduleCommands(schedule *kingpin.CmdClause, q *queries.Schedule) {
 	cmd := &scheduleHandler{q: q}
 	view := schedule.Command("view", "Display current maintenance schedule").Action(cmd.handleList)
